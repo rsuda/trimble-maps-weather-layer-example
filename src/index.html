@@ -6,8 +6,81 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script src="https://maps.alk.com/api/1.2/alkmaps.js"></script>
+  <script>
+    function init() {
+      ALKMaps.APIKey = "17CA0885B03A6B4FADBDC3D1A51DC0BD"; // You will need to replace this with your own API key
+      var lon = -87.42115,
+        lat = 41.58966,
+        zoom = 5;
+      // Create main map object
+      var map = new ALKMaps.Map("map", {
+        displayProjection: new ALKMaps.Projection("EPSG:4326")
+      });
+      var alkmap = new ALKMaps.Layer.BaseMap(
+        "ALK Maps",
+        { style: ALKMaps.STYLE.ROADATLAS },
+        {
+          displayInLayerSwitcher: true,
+          singleTile: false,
+          wrapDateLine: true
+        }
+      );
+
+      var alktraffic = new ALKMaps.Layer.Traffic(
+        "ALK LiveTraffic&trade;",
+        {},
+        { minScale: 500000 }
+      );
+
+      var sat = new ALKMaps.Layer.WeatherRadar(
+        "Satellite",
+        { display: "satellite" }, // satellite
+        { displayInLayerSwitcher: true, opacity: 0.5, visibility: true }
+      );
+
+      var radar = new ALKMaps.Layer.WeatherRadar(
+        "Radar",
+        { display: "radar" }, // radar
+        { displayInLayerSwitcher: true, opacity: 0.5, visibility: false }
+      );
+
+      //Add the layers to the map object
+      map.addLayers([alkmap, sat, radar]);
+
+      //Change the initial viewpoint of the map
+      var lonLat = new ALKMaps.LonLat(lon, lat);
+      var toProj = map.getProjectionObject();
+      var fromProj = new ALKMaps.Projection("EPSG:4326");
+      lonLat = lonLat.transform(fromProj, toProj); // Transform from one projection to another.
+      map.setCenter(lonLat, zoom);
+
+      var switcherControl = new ALKMaps.Control.LayerSwitcher({
+        div: ALKMaps.Util.getElement("external-controls"),
+        roundedCorner: false
+      });
+      map.addControl(switcherControl);
+    }
+  </script>
+
+  <script>
+    window.ga = function () {
+      ga.q.push(arguments);
+    };
+    ga.q = [];
+    ga.l = +new Date();
+    ga("create", "UA-787590-49", "auto");
+    ga("set", "transport", "beacon");
+    ga("set", "anonymizeIp", true);
+    ga("send", "pageview");
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async></script>
 </head>
-<body>
-  <app-root></app-root>
+
+<body onload="init()">
+  <div id="example-container">
+    <div id="map" style="width: 100%; height: 95vh"></div>
+  </div>
 </body>
+
 </html>
